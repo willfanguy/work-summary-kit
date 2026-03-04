@@ -1,0 +1,130 @@
+{
+  "_comment": "Full example config with all data sources enabled. Copy to ~/.config/work-summary/config.json and customize.",
+  "version": "1.0",
+
+  "user": {
+    "name": "Jane Engineer",
+    "email": "jane@company.com",
+    "timezone": "America/New_York",
+    "slack_username": "jane.engineer",
+    "jira_email": "jane@company.com"
+  },
+
+  "paths": {
+    "output_dir": "~/work-summaries",
+    "daily_output_dir": "daily",
+    "weekly_output_dir": "weekly",
+    "state_file": ".state.json",
+    "kit_path": "~/.claude/skills/work-summary-kit"
+  },
+
+  "data_sources": {
+    "git": {
+      "enabled": true,
+      "repos": [
+        {
+          "name": "backend-service",
+          "path": "/Users/jane/repos/backend-service",
+          "default_branch": "main"
+        },
+        {
+          "name": "frontend-app",
+          "path": "/Users/jane/repos/frontend-app",
+          "default_branch": "main"
+        }
+      ],
+      "author_email": "jane@company.com"
+    },
+
+    "jira": {
+      "enabled": true,
+      "_comment": "Set JIRA_USERNAME and JIRA_API_TOKEN in your shell profile",
+      "base_url": "https://company.atlassian.net",
+      "project_keys": ["ENG", "PLAT", "FE"],
+      "username_env": "JIRA_USERNAME",
+      "token_env": "JIRA_API_TOKEN",
+      "done_statuses": ["Done", "Closed", "Resolved"],
+      "in_progress_statuses": ["In Progress", "In Development", "In Review"],
+      "handed_off_statuses": ["QA", "Ready for Staging"]
+    },
+
+    "calendar": {
+      "enabled": true,
+      "_comment": "Requires Google Workspace MCP server configured in Claude Code",
+      "provider": "google",
+      "calendar_id": "primary",
+      "working_hours": {
+        "start": "09:00",
+        "end": "18:00"
+      },
+      "meeting_categories": {
+        "standup": ["standup", "stand-up", "daily", "scrum"],
+        "planning": ["planning", "sprint", "refinement", "grooming", "retro"],
+        "review": ["review", "demo", "showcase", "presentation"],
+        "one_on_one": ["1:1", "1-on-1", "one-on-one", "check-in"],
+        "social": ["lunch", "coffee", "social", "happy hour"]
+      }
+    },
+
+    "slack": {
+      "enabled": true,
+      "_comment": "Set SLACK_TOKEN (xoxp user token) in your shell profile. Requires search:read scope.",
+      "token_env": "SLACK_TOKEN",
+      "username": "jane.engineer",
+      "channel_categories": {
+        "project": ["eng-*", "proj-*", "team-*"],
+        "coordination": ["general", "engineering"],
+        "support": ["ask-*", "help-*"]
+      }
+    },
+
+    "drive": {
+      "enabled": true,
+      "_comment": "Requires Google Workspace MCP server configured in Claude Code",
+      "provider": "google"
+    },
+
+    "tasks": {
+      "enabled": true,
+      "provider": "jira",
+      "_comment": "Options: none, obsidian, jira, google-tasks, linear. Pick one.",
+      "jira_tasks": {
+        "assignee_email": "jane@company.com",
+        "active_statuses": ["To Do", "In Progress", "In Development", "In Review"]
+      }
+    }
+  },
+
+  "output": {
+    "template": "daily-default",
+    "weekly_template": "weekly-default",
+    "file_naming": "YYYY-MM-DD.md",
+    "weekly_file_naming": "YYYY-[W]WW.md",
+    "sections_order": [
+      "executive_summary",
+      "metrics",
+      "code_activity",
+      "jira_updates",
+      "meetings",
+      "slack_activity",
+      "drive_activity",
+      "completed_tasks",
+      "tomorrow_focus",
+      "blockers"
+    ]
+  },
+
+  "project_mappings": {
+    "backend-service": "Backend Platform",
+    "frontend-app": "Customer Portal",
+    "infra": "Infrastructure"
+  },
+
+  "name_mappings": {
+    "confirmed": {
+      "bob@company.com": "Bob Smith",
+      "alice@company.com": "Alice Johnson"
+    },
+    "unverified": {}
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "user": {
+    "name": "Your Name",
+    "email": "you@company.com",
+    "timezone": "America/Chicago"
+  },
+  "paths": {
+    "output_dir": "~/work-summaries"
+  },
+  "data_sources": {
+    "git": {
+      "enabled": true,
+      "repos": [
+        {
+          "name": "my-project",
+          "path": "/path/to/your/repo"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.daily-summary</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <!-- UPDATE THESE PATHS -->
+        <string>cd /path/to/your/workdir &amp;&amp; /path/to/run-with-timeout.sh 900 /path/to/claude -p --dangerously-skip-permissions "Run the daily-summary skill to create today's work summary"</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <!-- UPDATE: add your claude binary directory -->
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <!-- Weekdays at 5:30 PM -->
+        <key>Hour</key>
+        <integer>17</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/daily-summary.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/daily-summary.error</string>
+
+    <key>TimeOut</key>
+    <integer>900</integer>
+</dict>
+</plist>

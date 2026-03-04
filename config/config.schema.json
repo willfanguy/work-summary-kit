@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Work Summary Kit Configuration",
+  "description": "Configuration for the work-summary-kit daily and weekly summary skills",
+  "type": "object",
+  "required": ["user", "paths"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Config schema version"
+    },
+    "user": {
+      "type": "object",
+      "required": ["name", "email", "timezone"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Your display name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Your primary work email"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone (e.g., America/Chicago, America/New_York, Europe/London)",
+          "default": "America/Chicago"
+        },
+        "slack_username": {
+          "type": "string",
+          "description": "Your Slack username (without @)"
+        },
+        "jira_email": {
+          "type": "string",
+          "format": "email",
+          "description": "Your JIRA email (if different from primary email)"
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "properties": {
+        "output_dir": {
+          "type": "string",
+          "description": "Root directory for summary output files",
+          "default": "~/work-summaries"
+        },
+        "daily_output_dir": {
+          "type": "string",
+          "description": "Directory for daily summaries (relative to output_dir or absolute)",
+          "default": "daily"
+        },
+        "weekly_output_dir": {
+          "type": "string",
+          "description": "Directory for weekly summaries (relative to output_dir or absolute)",
+          "default": "weekly"
+        },
+        "state_file": {
+          "type": "string",
+          "description": "Path to state tracking file (relative to output_dir or absolute)",
+          "default": ".state.json"
+        },
+        "kit_path": {
+          "type": "string",
+          "description": "Path to the work-summary-kit installation (auto-detected by summary-init)"
+        }
+      }
+    },
+    "data_sources": {
+      "type": "object",
+      "properties": {
+        "git": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "repos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path"],
+                "properties": {
+                  "name": { "type": "string", "description": "Display name for this repo" },
+                  "path": { "type": "string", "description": "Absolute path to the git repo" },
+                  "default_branch": { "type": "string", "default": "main" }
+                }
+              },
+              "description": "Git repositories to track"
+            },
+            "author_email": {
+              "type": "string",
+              "description": "Email to filter commits by (defaults to user.email)"
+            }
+          }
+        },
+        "jira": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "base_url": {
+              "type": "string",
+              "description": "JIRA instance URL (e.g., https://company.atlassian.net)"
+            },
+            "project_keys": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "JIRA project keys to track (e.g., [\"PROJ\", \"ENG\"])"
+            },
+            "username_env": {
+              "type": "string",
+              "default": "JIRA_USERNAME",
+              "description": "Environment variable name for JIRA username"
+            },
+            "token_env": {
+              "type": "string",
+              "default": "JIRA_API_TOKEN",
+              "description": "Environment variable name for JIRA API token"
+            },
+            "done_statuses": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["Done", "Closed", "Resolved"]
+            },
+            "in_progress_statuses": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["In Progress", "In Development", "In Review"]
+            },
+            "handed_off_statuses": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["QA", "Ready for Staging"]
+            }
+          }
+        },
+        "calendar": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "provider": {
+              "type": "string",
+              "enum": ["google"],
+              "default": "google",
+              "description": "Calendar provider (currently only Google Calendar supported)"
+            },
+            "calendar_id": {
+              "type": "string",
+              "default": "primary"
+            },
+            "working_hours": {
+              "type": "object",
+              "properties": {
+                "start": { "type": "string", "default": "09:00" },
+                "end": { "type": "string", "default": "18:00" }
+              }
+            },
+            "meeting_categories": {
+              "type": "object",
+              "description": "Keyword-to-category mappings for meeting classification",
+              "properties": {
+                "standup": { "type": "array", "items": { "type": "string" }, "default": ["standup", "stand-up", "daily", "scrum"] },
+                "planning": { "type": "array", "items": { "type": "string" }, "default": ["planning", "sprint", "refinement", "grooming", "retro"] },
+                "review": { "type": "array", "items": { "type": "string" }, "default": ["review", "demo", "showcase", "presentation"] },
+                "one_on_one": { "type": "array", "items": { "type": "string" }, "default": ["1:1", "1-on-1", "one-on-one", "check-in"] },
+                "social": { "type": "array", "items": { "type": "string" }, "default": ["lunch", "coffee", "social", "happy hour"] }
+              }
+            }
+          }
+        },
+        "slack": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "token_env": {
+              "type": "string",
+              "default": "SLACK_TOKEN",
+              "description": "Environment variable name for Slack user token (xoxp-...)"
+            },
+            "username": {
+              "type": "string",
+              "description": "Your Slack username for message search"
+            },
+            "channel_categories": {
+              "type": "object",
+              "description": "Channel name patterns grouped by category",
+              "properties": {
+                "project": { "type": "array", "items": { "type": "string" }, "default": [] },
+                "coordination": { "type": "array", "items": { "type": "string" }, "default": [] },
+                "support": { "type": "array", "items": { "type": "string" }, "default": [] }
+              }
+            }
+          }
+        },
+        "drive": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "provider": {
+              "type": "string",
+              "enum": ["google"],
+              "default": "google"
+            }
+          }
+        },
+        "tasks": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "provider": {
+              "type": "string",
+              "enum": ["none", "obsidian", "jira", "google-tasks", "linear"],
+              "default": "none",
+              "description": "Which task management system to use as source of truth"
+            },
+            "obsidian": {
+              "type": "object",
+              "description": "Config for Obsidian Task Notes provider",
+              "properties": {
+                "tasks_path": { "type": "string", "description": "Absolute path to the Task Notes directory" },
+                "status_field": { "type": "string", "default": "status" },
+                "done_value": { "type": "string", "default": "done" },
+                "completed_date_field": { "type": "string", "default": "completedDate" },
+                "project_field": { "type": "string", "default": "project" },
+                "priority_field": { "type": "string", "default": "priority" }
+              }
+            },
+            "jira_tasks": {
+              "type": "object",
+              "description": "Config for JIRA-as-task-system (uses jira data_source settings for auth)",
+              "properties": {
+                "assignee_email": { "type": "string", "description": "JIRA email to filter assigned tickets" },
+                "active_statuses": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "default": ["To Do", "In Progress", "In Development", "In Review"]
+                }
+              }
+            },
+            "google_tasks": {
+              "type": "object",
+              "description": "Config for Google Tasks provider",
+              "properties": {
+                "list_id": { "type": "string", "default": "@default", "description": "Google Tasks list ID" }
+              }
+            },
+            "linear": {
+              "type": "object",
+              "description": "Config for Linear provider",
+              "properties": {
+                "token_env": { "type": "string", "default": "LINEAR_API_TOKEN" },
+                "team_key": { "type": "string", "description": "Linear team key (e.g., ENG)" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string",
+          "default": "daily-default",
+          "description": "Template name (daily-default, daily-compact, daily-engineering, daily-manager) or path to custom template"
+        },
+        "weekly_template": {
+          "type": "string",
+          "default": "weekly-default"
+        },
+        "file_naming": {
+          "type": "string",
+          "default": "YYYY-MM-DD.md",
+          "description": "Daily file naming pattern (YYYY=year, MM=month, DD=day, ddd=weekday)"
+        },
+        "weekly_file_naming": {
+          "type": "string",
+          "default": "YYYY-[W]WW.md",
+          "description": "Weekly file naming pattern (WW=ISO week number)"
+        },
+        "sections_order": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "executive_summary",
+              "metrics",
+              "plan_vs_actual",
+              "code_activity",
+              "jira_updates",
+              "meetings",
+              "slack_activity",
+              "drive_activity",
+              "completed_tasks",
+              "tomorrow_focus",
+              "blockers"
+            ]
+          },
+          "default": [
+            "executive_summary",
+            "metrics",
+            "code_activity",
+            "jira_updates",
+            "meetings",
+            "slack_activity",
+            "drive_activity",
+            "completed_tasks",
+            "tomorrow_focus",
+            "blockers"
+          ],
+          "description": "Which sections to include and in what order. Remove a section name to hide it."
+        }
+      }
+    },
+    "project_mappings": {
+      "type": "object",
+      "description": "Optional mapping of folder/path names to friendly project names",
+      "additionalProperties": { "type": "string" }
+    },
+    "name_mappings": {
+      "type": "object",
+      "description": "Optional email-to-display-name overrides",
+      "properties": {
+        "confirmed": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Verified name overrides (email -> display name)"
+        },
+        "unverified": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Unverified name overrides (email -> prefix only)"
+        }
+      }
+    }
+  }
+}
