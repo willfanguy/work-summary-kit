@@ -10,7 +10,7 @@ Generate comprehensive daily and weekly work summaries using Claude Code. Aggreg
 
 ```bash
 cd ~/.claude/skills
-git clone https://github.com/your-org/work-summary-kit.git
+git clone https://github.com/willfanguy/work-summary-kit.git
 ```
 
 ### 2. Configure
