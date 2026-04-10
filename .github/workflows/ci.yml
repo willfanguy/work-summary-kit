@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: scheduling
+
+      - name: Validate JSON files
+        run: |
+          for f in config/*.json; do
+            echo "Validating $f..."
+            python3 -m json.tool "$f" > /dev/null
+          done
+
+      - name: Validate configs against schema
+        run: |
+          pip install check-jsonschema
+          check-jsonschema --schemafile config/config.schema.json config/config.example.json
+          check-jsonschema --schemafile config/config.schema.json config/config.minimal.json
